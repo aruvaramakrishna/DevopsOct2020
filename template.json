@@ -1,0 +1,78 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "VirtualNetworkName": {
+           "type": "string",
+           "metadata": {
+                "description": "Name of the virtual network"
+            }
+        },
+        "SubnetName": {
+           "type": "string",
+           "metadata": {
+                "description": "Name of the subnet"
+            }
+        },
+        "storageaccount": {
+           "type": "string",
+           "metadata": {
+                "description": "Name of the storage account"
+            }
+        }
+    },
+    "variables": {
+        "vnetaddress": ["10.0.0.0/16"],
+        "subnetaddress": "10.0.0.0/24",
+        "publicIPAddress": "testpubip"
+    },
+    "resources": [
+     {
+         "name": "[parameters('VirtualNetworkName')]",
+         "type": "Microsoft.Network/virtualNetworks",
+         "apiVersion": "2018-08-01",
+         "location": "[resourceGroup().location]",
+         "properties": {
+             "addressSpace": {
+                 "addressPrefixes": "[variables('vnetaddress')]"
+             },
+             "subnets": [
+                 {
+                     "name": "[parameters('SubnetName')]",
+                     "properties": {
+                         "addressPrefix": "[variables('subnetaddress')]"
+                     }
+                 }
+            ]
+         }
+     },
+     {
+         "name": "[parameters('storageaccount')]",
+         "type": "Microsoft.Storage/storageAccounts",
+         "apiVersion": "2015-06-15",
+         "location": "[resourceGroup().location]",
+         "tags": {
+             "displayName": "dev"
+         },
+         "properties": {
+             "accountType": "Standard_LRS"
+         }
+     },
+     {
+         "name": "[variables('publicIPAddress')]",
+         "type": "Microsoft.Network/publicIPAddresses",
+         "apiVersion": "2019-11-01",
+         "location": "[resourceGroup().location]",
+         "tags": {
+             "displayName": "dev"
+         },
+         "properties": {
+             "publicIPAllocationMethod": "Dynamic",
+             "dnsSettings": {
+                 "domainNameLabel": "octtrainingdns"
+             }
+         }
+     }
+    ],
+    "outputs": {}
+}
